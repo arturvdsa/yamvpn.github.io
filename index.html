@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YamVPN - Быстрый VPN</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #0a1628 0%, #1a3a6a 50%, #2a6a9a 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: #fff;
+}
+.container {
+  max-width: 500px;
+  width: 100%;
+  background: rgba(10, 30, 60, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  padding: 35px 25px 40px;
+  border: 2px solid rgba(100, 200, 255, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(100, 200, 255, 0.1);
+  text-align: center;
+}
+.logo {
+  font-size: 28px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #4fc3ff, #00e5ff, #4fc3ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(0, 200, 255, 0.3);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.subtitle {
+  font-size: 14px;
+  color: rgba(150, 220, 255, 0.7);
+  margin-bottom: 25px;
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+.divider {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4fc3ff, transparent);
+  margin: 0 auto 25px;
+  border-radius: 2px;
+}
+.btn {
+  display: inline-block;
+  padding: 16px 30px;
+  margin: 10px 0;
+  border-radius: 16px;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  width: 100%;
+  text-align: center;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-tg {
+  background: linear-gradient(135deg, #0088cc, #00aaff);
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 136, 204, 0.3);
+}
+.btn-tg:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(0, 136, 204, 0.5);
+}
+.btn-tg::after {
+  content: '➜';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+}
+.btn-game {
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(255, 69, 0, 0.3);
+}
+.btn-game:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(255, 69, 0, 0.5);
+}
+
+/* ===== ИГРА ===== */
+#game-area {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(100, 200, 255, 0.1);
+  display: none;
+}
+#game-area.active {
+  display: block;
+}
+.game-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: rgba(200, 230, 255, 0.8);
+}
+.game-stats span {
+  background: rgba(0, 50, 100, 0.4);
+  padding: 8px 18px;
+  border-radius: 30px;
+  border: 1px solid rgba(100, 200, 255, 0.15);
+}
+.game-stats .score {
+  color: #ffd700;
+  font-weight: 700;
+}
+.click-target {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  margin: 10px auto 20px;
+  background: radial-gradient(circle at 30% 30%, #ff6b35, #cc2200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 0 10px 40px rgba(255, 50, 0, 0.4), inset 0 -5px 20px rgba(0,0,0,0.3);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  flex-direction: column;
+  line-height: 1.2;
+  padding: 10px;
+}
+.click-target:active {
+  transform: scale(0.92);
+  box-shadow: 0 5px 20px rgba(255, 50, 0, 0.6);
+}
+.click-target .small {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+.shop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 15px 0 10px;
+}
+.shop-btn {
+  background: rgba(0, 80, 160, 0.5);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 100px;
+}
+.shop-btn:hover {
+  background: rgba(0, 80, 160, 0.8);
+  transform: translateY(-2px);
+}
+.shop-btn .price {
+  color: #ffd700;
+  font-weight: 700;
+}
+.shop-btn.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.shop-btn.locked:hover {
+  transform: none;
+}
+.yamvpn-event {
+  background: linear-gradient(135deg, #00e5ff, #0077ff);
+  border-radius: 16px;
+  padding: 15px 20px;
+  margin-top: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  animation: pulse-glow 2s infinite;
+  display: none;
+}
+.yamvpn-event.active {
+  display: block;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 200, 255, 0.2); }
+  50% { box-shadow: 0 0 50px rgba(0, 200, 255, 0.6); }
+}
+.yamvpn-event .icon {
+  font-size: 28px;
+  margin-right: 10px;
+}
+.back-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(200, 230, 255, 0.6);
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 15px;
+  transition: 0.2s;
+  width: 100%;
+}
+.back-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.footer {
+  margin-top: 20px;
+  font-size: 11px;
+  color: rgba(100, 180, 255, 0.3);
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+  <div class="logo">✦ YAMVPN</div>
+  <div class="subtitle">БЫСТРЫЙ · ЛУЧШИЙ · VPN</div>
+  <div class="divider"></div>
+
+  <!-- Главное меню -->
+  <div id="main-menu">
+    <a href="https://t.me/forumyamvpn" target="_blank" class="btn btn-tg">📱 ТГК</a>
+    <button class="btn btn-game" onclick="openGame()">🎮 Роскомнадзор Кликер</button>
+  </div>
+
+  <!-- Игровая зона -->
+  <div id="game-area">
+    <h3 style="font-size:18px;margin-bottom:5px;color:#4fc3ff;">🛡️ РОСКОМНАДЗОР КЛИКЕР</h3>
+    <div class="game-stats">
+      <span>🔰 Баллы: <span class="score" id="score">0</span></span>
+      <span>🔒 Блокировок: <span id="blockCount">0</span></span>
+    </div>
+
+    <div class="click-target" id="clickTarget" onclick="clickHandler()">
+      РОСКОМНАДЗОР
+      <span class="small">кликай сюда</span>
+    </div>
+
+    <div class="shop">
+      <button class="shop-btn" id="blockSite" onclick="buyBlock('site')">
+        🚫 Заблокировать сайт<br>
+        <span class="price">50 баллов</span>
+      </button>
+      <button class="shop-btn" id="blockApp" onclick="buyBlock('app')">
+        📱 Заблокировать приложение<br>
+        <span class="price">100 баллов</span>
+      </button>
+      <button class="shop-btn" id="blockAll" onclick="buyBlock('all')">
+        ☢️ Заблокировать всё<br>
+        <span class="price">250 баллов</span>
+      </button>
+    </div>
+
+    <div class="yamvpn-event" id="yamvpnEvent">
+      <span class="icon">⚡</span>
+      <span id="yamvpnText">🛡️ YAMVPN разблокировал всё!</span>
+    </div>
+
+    <button class="back-btn" onclick="closeGame()">← Вернуться в меню</button>
+  </div>
+
+  <div class="footer">© 2026 YAMVPN · Свобода в сети</div>
+</div>
+
+<script>
+// ============================================================
+//  ИГРА "РОСКОМНАДЗОР КЛИКЕР"
+// ============================================================
+let score = 0;
+let blocks = { site: 0, app: 0, all: 0 };
+let totalBlocks = 0;
+let clickPower = 1;
+let yamvpnTimer = null;
+let yamvpnActive = false;
+
+const scoreEl = document.getElementById('score');
+const blockCountEl = document.getElementById('blockCount');
+const clickTarget = document.getElementById('clickTarget');
+
+function updateUI() {
+  scoreEl.textContent = score;
+  blockCountEl.textContent = totalBlocks;
+  
+  // Обновляем доступность кнопок
+  document.getElementById('blockSite').className = 'shop-btn' + (score < 50 ? ' locked' : '');
+  document.getElementById('blockApp').className = 'shop-btn' + (score < 100 ? ' locked' : '');
+  document.getElementById('blockAll').className = 'shop-btn' + (score < 250 ? ' locked' : '');
+}
+
+function clickHandler() {
+  if (yamvpnActive) return;
+  const add = clickPower + Math.floor(Math.random() * 3);
+  score += add;
+  // Анимация
+  clickTarget.style.transform = 'scale(0.92)';
+  setTimeout(() => { clickTarget.style.transform = ''; }, 100);
+  updateUI();
+}
+
+function buyBlock(type) {
+  if (yamvpnActive) return;
+  
+  let cost = 0;
+  let label = '';
+  switch(type) {
+    case 'site': cost = 50; label = 'сайт'; break;
+    case 'app': cost = 100; label = 'приложение'; break;
+    case 'all': cost = 250; label = 'всё'; break;
+  }
+  
+  if (score < cost) return;
+  
+  score -= cost;
+  blocks[type] = (blocks[type] || 0) + 1;
+  totalBlocks++;
+  
+  // Эффект блокировки
+  const msg = `🔒 Заблокирован ${label}! (${blocks[type]})`;
+  showYamvpnEvent(msg, '#ff6b35', false);
+  
+  updateUI();
+  
+  // Шанс 15% что придёт YAMVPN и разблокирует
+  if (Math.random() < 0.15) {
+    setTimeout(() => {
+      yamvpnRaid();
+    }, 800);
+  }
+}
+
+function yamvpnRaid() {
+  if (yamvpnActive) return;
+  yamvpnActive = true;
+  
+  // Откат блокировок
+  const unblocked = totalBlocks;
+  const sitesUnblocked = blocks.site || 0;
+  const appsUnblocked = blocks.app || 0;
+  const allUnblocked = blocks.all || 0;
+  
+  blocks.site = 0;
+  blocks.app = 0;
+  blocks.all = 0;
+  totalBlocks = 0;
+  
+  // Бонус за разблокировку
+  const bonus = unblocked * 10 + 20;
+  score += bonus;
+  
+  const msg = `⚡ YAMVPN РАЗБЛОКИРОВАЛ всё! +${bonus} баллов!`;
+  showYamvpnEvent(msg, '#00e5ff', true);
+  
+  // Спецэффект
+  clickTarget.style.background = 'radial-gradient(circle at 30% 30%, #00e5ff, #0077ff)';
+  setTimeout(() => {
+    clickTarget.style.background = '';
+  }, 1500);
+  
+  updateUI();
+  
+  // Через 3 секунды можно снова блокировать
+  setTimeout(() => {
+    yamvpnActive = false;
+    document.getElementById('yamvpnEvent').classList.remove('active');
+  }, 3500);
+}
+
+function showYamvpnEvent(text, color, isRaid) {
+  const el = document.getElementById('yamvpnEvent');
+  const textEl = document.getElementById('yamvpnText');
+  textEl.textContent = text;
+  el.style.background = isRaid 
+    ? 'linear-gradient(135deg, #00e5ff, #0077ff)' 
+    : 'linear-gradient(135deg, #ff6b35, #cc2200)';
+  el.classList.add('active');
+  
+  clearTimeout(yamvpnTimer);
+  yamvpnTimer = setTimeout(() => {
+    el.classList.remove('active');
+  }, 3000);
+}
+
+// ============================================================
+//  НАВИГАЦИЯ
+// ============================================================
+function openGame() {
+  document.getElementById('main-menu').style.display = 'none';
+  document.getElementById('game-area').classList.add('active');
+  updateUI();
+}
+
+function closeGame() {
+  document.getElementById('main-menu').style.display = 'block';
+  document.getElementById('game-area').classList.remove('active');
+}
+
+// Авто-событие: YAMVPN может прийти в любой момент (каждые 30-60 сек)
+setInterval(() => {
+  if (document.getElementById('game-area').classList.contains('active') && !yamvpnActive && totalBlocks > 0) {
+    if (Math.random() < 0.20) {
+      yamvpnRaid();
+    }
+  }
+}, 15000);
+
+// Клик по пробелу тоже работает
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && document.getElementById('game-area').classList.contains('active')) {
+    e.preventDefault();
+    clickHandler();
+  }
+});
+
+// Инициализация
+updateUI();
+console.log('🛡️ Роскомнадзор Кликер загружен!');
+console.log('⚡ YAMVPN может прийти в любой момент...');
+</script>
+</body>
+</html>
